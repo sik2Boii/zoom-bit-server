@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,4 +29,25 @@ public class BithumbApiController {
                     .body("Failed to save all markets.");
         }
     }
+
+    @GetMapping("/getTicker")
+    public ResponseEntity<String> getTicker(@RequestParam String market) {
+        try {
+            bithumbApiService.getTicker(market);
+            return ResponseEntity.ok("market: " + market + " Current price retrieval successful");
+        } catch (Exception e) {
+            return new ResponseEntity<>("market: " + market + " Failed to current price", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getAllTicker")
+    public ResponseEntity<String> getAllTicker() {
+        try {
+            bithumbApiService.getAllTicker();
+            return ResponseEntity.ok("All market current price retrieval successful");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to current price", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
