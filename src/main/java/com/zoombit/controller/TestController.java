@@ -1,6 +1,5 @@
 package com.zoombit.controller;
 
-import com.zoombit.repository.TestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,20 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @Autowired
-    private TestRepository testRepository;
-
-    @Autowired
     private RedisTemplate redisTemplate;
 
     @Qualifier("kafkaTemplate")
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
-
-    @GetMapping("/")
-    public String test() {
-        testRepository.findAll().forEach(System.out::println);
-        return "test";
-    }
 
     @PostMapping("/set")
     public String setValue(@RequestParam String key, @RequestParam String value) {
