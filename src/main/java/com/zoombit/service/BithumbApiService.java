@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.RateLimiter;
 import com.zoombit.domain.dto.MarketDTO;
 import com.zoombit.domain.dto.TickerDTO;
+import com.zoombit.domain.dto.TickerResponseDTO;
 import com.zoombit.domain.entity.Markets;
 import com.zoombit.repository.MarketRepository;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class BithumbApiService {
 
     private final String API_MARKET_URL = "https://api.bithumb.com/v1/market/all"; // 마켓 코드 조회
     private final String API_TICKER_URL = "https://api.bithumb.com/v1/ticker";
+    private final String API_ALL_TICKER_URL = "https://api.bithumb.com/public/ticker/ALL_KRW";
 
     public void getAllMarkets() {
 
@@ -90,6 +92,19 @@ public class BithumbApiService {
             getTicker(marketId);
         }
 
+    }
+
+    public void getAllTickerV2() {
+
+        String response = restTemplate.getForObject(API_ALL_TICKER_URL, String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            TickerResponseDTO tmp = mapper.readValue(response, TickerResponseDTO.class);
+            System.out.println("dhkshdakdhka");
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     public List<String> getAllMarketIds() {

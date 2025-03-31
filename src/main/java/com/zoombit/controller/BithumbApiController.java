@@ -50,4 +50,14 @@ public class BithumbApiController {
         }
     }
 
+    @GetMapping("/getAllTickerV2")
+    public ResponseEntity<String> getAllTickerV2() {
+        try {
+            bithumbApiService.getAllTickerV2();
+            return ResponseEntity.ok("All market current price retrieval successful");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to current price", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

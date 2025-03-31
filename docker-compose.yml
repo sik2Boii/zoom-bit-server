@@ -10,7 +10,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - 3306:3306
+      - 3307:3306
     healthcheck:
       test: [ "CMD", "mysqladmin" , "ping"]
       interval: 5s
@@ -26,18 +26,22 @@ services:
       interval: 5s
       retries: 10
 
-  # Zookeeper
+  # Zookeeper (모든 Kafka 브로커가 공유)
   zookeeper:
     image: confluentinc/cp-zookeeper
-    container_name: zoom-bit-zookeeper
+    container_name: zookeeper
     restart: always
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - kafka-network
 
-  # Kafka
-  kafka:
+  # Kafka Broker 1
+  kafka-1:
     image: confluentinc/cp-kafka
-    container_name: zoom-bit-kafka
+    container_name: kafka-1
     restart: always
     depends_on:
       - zookeeper
@@ -46,9 +50,47 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - kafka-network
+
+  # Kafka Broker 2
+  kafka-2:
+    image: confluentinc/cp-kafka
+    container_name: kafka-2
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093
+    networks:
+      - kafka-network
+
+  # Kafka Broker 3
+  kafka-3:
+    image: confluentinc/cp-kafka
+    container_name: kafka-3
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9094
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9094
+    networks:
+      - kafka-network
+
+networks:
+  kafka-network:
 
 volumes:
   mysql_data:
